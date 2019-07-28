@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jul 28, 2019 at 04:13 PM
+-- Generation Time: Jul 28, 2019 at 05:44 PM
 -- Server version: 5.7.19
 -- PHP Version: 5.6.31
 
@@ -99,7 +99,14 @@ CREATE TABLE IF NOT EXISTS `users` (
   `created_at` date NOT NULL,
   PRIMARY KEY (`id`),
   KEY `roleid` (`roleid`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password`, `roleid`, `created_at`) VALUES
+(30, 'admin', '$2b$10$jAQOvUU/SAwYuOWLo0ueEOY1EL5lVRuXmoYRWExfnTjCoKaKyEgK6', 1, '2019-07-28');
 
 --
 -- Constraints for dumped tables
