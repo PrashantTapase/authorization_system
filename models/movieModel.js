@@ -1,89 +1,64 @@
-
 'user strict';
-var sql = require('./db.js');
+const sql = require('./db.js');
 
 //Movie object constructor
-var Movie = function (movie) {
-    this.movie = movie.movie;
-    this.status = movie.status;
-    this.created_at = new Date();
+const Movie = function (movie) {
+    this.moviename = movie.moviename;
+    this.status = movie.status ? movie.status : 1;
+    this.date = new Date();
 };
 
-Movie.createMovie = async (newTask) => {
-    // sql.query("INSERT INTO movies set ?", newTask, function (err, res) {
+const createMovie = async (newMovie) => {
 
-    //     if (err) {
-    //         console.log("error: ", err);
-    //         result(err, null);
-    //     }
-    //     else {
-    //         console.log(res.insertId);
-    //         result(null, res.insertId);
-    //     }
-    // });
+    try {
+        const insertResult = await sql.query("INSERT INTO movies set ?", newMovie);
+        if (insertResult) {
+            return true;
+        } else {
+            return false
+        };
+    } catch (error) {
+        return error
+    }
 
-    const insertResult = await sql.query("INSERT INTO movies set ?", newTask);
-    return insertResult;
 };
 
-// Movie.getTaskById = function (taskId, result) {
-//     sql.query("Select movie from movies where id = ? ", movieId, function (err, res) {
-//         if (err) {
-//             console.log("error: ", err);
-//             result(err, null);
-//         }
-//         else {
-//             result(null, res);
+const updateById = async (id, value, key) => {
 
-//         }
-//     });
-// };
+    try {
 
-// Movie.getAllTask = function (result) {
-//     sql.query("Select * from movies", function (err, res) {
+        let updateMovie;
+        if (key == 'moviename') {
+            updateMovie = await sql.query("UPDATE movies SET moviename = ? WHERE id = ?", [value, id]);
+        } else if (key == 'status') {
+            updateMovie = await sql.query("UPDATE movies SET status = ? WHERE id = ?", [value, id]);
+        }
 
-//         if (err) {
-//             console.log("error: ", err);
-//             result(null, err);
-//         }
-//         else {
-//             console.log('movies : ', res);
+        if (updateMovie) {
+            return true;
+        } else {
+            return false
+        }
+        
+    } catch (error) {
+        return error
+    }
+}
 
-//             result(null, res);
-//         }
-//     });
-// };
+const getMovie = (id, result) => {
+    sql.query(`SELECT moviename, date FROM movies WHERE id = ?`, [id], function (err, res) {
+        if (err) {
+            console.log("error: ", err);
+            result(null, err);
+        } else {
+            result(null, res);
+        }
+    });
+}
 
-Movie.updateById = async (id, movie) => {
-    // sql.query("UPDATE movies SET movie = ? WHERE id = ?", [movie.movie, id], function (err, res) {
-    //     if (err) {
-    //         console.log("error: ", err);
-    //         result(null, err);
-    //     }
-    //     else {
-    //         result(null, res);
-    //     }
-    // });
-
-    const updateMovie = sql.query("UPDATE movies SET movie = ? WHERE id = ?", [movie.movie, id]);
-    return updateMovie;
+module.exports = {
+    Movie,
+    createMovie,
+    updateById,
+    getMovie
 };
-
-Movie.removeMovie = async (id) => {
-    // sql.query("DELETE FROM movies WHERE id = ?", [id], function (err, res) {
-
-    //     if (err) {
-    //         console.log("error: ", err);
-    //         result(null, err);
-    //     }
-    //     else {
-
-    //         result(null, res);
-    //     }
-    // });
-
-    const removeResult = await sql.query("DELETE FROM movies WHERE id = ?", [id]);
-    return removeResult;
-};
-
-module.exports = movie;

@@ -3,9 +3,8 @@ const router = express.Router();
 
 const movieCtrl = require('../controllers/movieCtrl');
 
-//router.get('/', authCtrl.list_all_tasks);
-router.post('/movie', movieCtrl.create_a_movie);
-router.put('/movie', movieCtrl.update_a_movie);
-router.delete('/movie', movieCtrl.update_a_task);
+router.get('/:id', movieCtrl.read_a_movie);
+router.post('/', movieCtrl.create_a_movie);
+router.put('/:id', movieCtrl.update_a_movie);
 
 module.exports = router;

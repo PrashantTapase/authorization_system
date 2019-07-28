@@ -1,84 +1,56 @@
 'user strict';
+
 var sql = require('./db.js');
 
-//Task object constructor
-var Task = function (task) {
-    this.task = task.task;
-    this.status = task.status;
-    this.created_at = new Date();
+const bcrypt = require('bcrypt');
+
+const getRoleById = (username, password, result) => {
+
+    sql.query('SELECT roleid, password FROM users WHERE username = ?', [username], function (err, res) {
+        if (err) {
+            console.log("error: ", err);
+            result(err);
+        } else {
+            const roleid = res[0].roleid;
+            const hashPassword = res[0].password;
+
+            sql.query("SELECT permissionids FROM roles WHERE id = ?", [roleid], function (err, res) {
+                if (err) {
+                    console.log("error: ", err);
+                    result(err);
+                } else {
+                    if (bcrypt.compareSync(password, hashPassword)) {
+                        console.log("res: ", res);
+                        result(null, res);
+                    } else {
+                        result(true, 'Invalid username/password');
+                    }
+                }
+            });
+        }
+    })
+
+
 };
 
-Task.createTask = async (newTask) => {
-    // sql.query("INSERT INTO tasks set ?", newTask, function (err, res) {
+const getPermissionId = (id, result) => {
 
-    //     if (err) {
-    //         console.log("error: ", err);
-    //         result(err, null);
-    //     }
-    //     else {
-    //         console.log(res.insertId);
-    //         result(null, res.insertId);
-    //     }
-    // });
-
-    const insertResult = await sql.query("INSERT INTO users set ?", newTask);
-    return insertResult;
-};
-
-// Task.getTaskById = function (taskId, result) {
-//     sql.query("Select task from users where id = ? ", taskId, function (err, res) {
-//         if (err) {
-//             console.log("error: ", err);
-//             result(err, null);
-//         }
-//         else {
-//             result(null, res);
-
-//         }
-//     });
-// };
-
-// Task.getAllTask = function (result) {
-//     sql.query("Select * from users", function (err, res) {
-
-//         if (err) {
-//             console.log("error: ", err);
-//             result(null, err);
-//         }
-//         else {
-//             console.log('tasks : ', res);
-
-//             result(null, res);
-//         }
-//     });
-// };
-
-Task.updateById = function (id, task, result) {
-    // sql.query("UPDATE tasks SET task = ? WHERE id = ?", [task.task, id], function (err, res) {
-    //     if (err) {
-    //         console.log("error: ", err);
-    //         result(null, err);
-    //     }
-    //     else {
-    //         result(null, res);
-    //     }
-    // });
-    const updateResult = await sql.query("UPDATE users SET task = ? WHERE id = ?", [task.task, id]);
-    return updateResult;
-};
-
-Task.remove = function (id, result) {
-    sql.query("DELETE FROM users WHERE id = ?", [id], function (err, res) {
-
+    sql.query(`SELECT permission FROM permission WHERE id IN (${id})`, function (err, res) {
         if (err) {
             console.log("error: ", err);
             result(null, err);
-        }
-        else {
-
-            result(null, res);
+        } else {
+            const newArray = []
+            res.find(obj => {
+                newArray.push(obj.permission)
+            })
+            result(null, newArray);
         }
     });
-};
 
-module.exports = Task;
+}
+
+module.exports = {
+    getRoleById,
+    getPermissionId
+}
